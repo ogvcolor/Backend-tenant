@@ -1,0 +1,19 @@
+FROM python:3.11-alpine3.19
+LABEL manteiner="admin@gvcolor.cloud"
+
+
+#AVOID PYTHON SAVING FILES IN BYTECODE 1: NO, 0: YES
+ENV PYTHONDONTWRITEBYTECODE 1
+
+#DEFINE THE OUTPUT WILL BE APPEARS ON THE CONSOLE IN REAL TIME
+
+ENV PYTHONUBUFFERED 1 
+
+#COPY THE FOLDER TO THE CONTAINER
+
+COPY ./scripts /scripts
+
+WORKDIR /backend_tenant
+
+EXPOSE 8000
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

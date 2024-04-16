@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  djangoapp:
+    container_name: djangoapp
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend_tenant:/backend_tenant  # Ajuste o caminho do volume
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    container_name: postgres_tenant
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: backend_tenant

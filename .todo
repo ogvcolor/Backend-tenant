@@ -1,0 +1,22 @@
+1- from app.models import Client, Domain
+
+2- tenant = Client (schema_name = "public", name= "public")
+
+tenant.save()
+
+domain = Domain(domain= "localhost", tenant=tenant, is_primary=True)
+
+domain.save ()
+
+tenant = Client (schema_name = "deltae", name= "DeltaE")
+
+tenant.save()
+
+domain = Domain(domain= "delta.localhost", tenant=tenant, is_primary=True)
+
+domain.save ()
+
+##### 
+Outra forma de criar 
+
+python manage.py create_tenant --domain-domain=test.localhost --schema_name=test --name=test
