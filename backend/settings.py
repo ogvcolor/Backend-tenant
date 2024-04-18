@@ -49,6 +49,12 @@ SHARED_APPS = [
 TENANT_APPS = [
     "knox",
     "login",
+    "certification",
+    "color",
+    "data_processing",
+    "device_configuration",
+    "formulas",
+    "linearization",
     ]
 
 INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -71,6 +77,7 @@ TENANT_MODEL = 'app.Client'
 TENANT_DOMAIN_MODEL = 'app.Domain'
 PUBLIC_SCHEMA_URLCONF = 'app.urls'
 ROOT_URLCONF = 'backend.urls'
+AUTH_USER_MODEL = "login.CustomUser"
 
 TEMPLATES = [
     {
@@ -180,7 +187,7 @@ REST_FRAMEWORK = {
 }
 
 REST_KNOX = {
-    "USER_SERIALIZER": "accounts.serializers.UserSerializer",
+    "USER_SERIALIZER": "login.serializers.UserSerializer",
     "AUTO_REFRESH": False,
     "TOKEN_TTL": timedelta(days=3),
     "AUTH_HEADER_PREFIX": "Token",

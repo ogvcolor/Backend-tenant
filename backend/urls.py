@@ -22,4 +22,13 @@ urlpatterns = [
    path('admin/', admin.site.urls),
    path('api/', include('login.urls')),
    re_path("", include("login.urls")),
+   path("api/auth/", include("login.urls")),
+    #path("swagger-docs/", schema_view),
+    path("api/", include("color.urls")),
+    
+    path("api/formulas/", include("formulas.urls")),
+    path("api/calibration/", include("linearization.urls")),
+    path("api/", include("data_processing.urls")),
+     path("api/standard/", include("certification.urls")),
+
 ]

@@ -1,29 +1,24 @@
 from django.contrib import admin
-from .models import CustomUser
-
-# Register your models here.
-# # STANDARD IMPORTS
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser, UserProfile
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from .models import CustomUser, UserProfile
 
-# # PROJECT IMPORTS
-from login.models import UserProfile
-
-
-class UserProfileInLine(admin.StackedInline):
+class UserProfileInline(admin.StackedInline):
     model = UserProfile
-    can_delete = False  # allows to delete the accounts and the users that are related to it
-    verbose_name_plural = 'UserProfiles'
+    can_delete = False
+    verbose_name_plural = 'Perfis de Usuário'
 
-
-# in this you will be able to visualize everything that we see on Django Admin Pannel
 class CustomizedUserAdmin(UserAdmin):
-    in_lines = [UserProfileInLine]
+    # Remover UserProfileInline da lista de inlines
+    inlines = []
+    # Removendo referências aos campos 'groups' e 'user_permissions'
+    filter_horizontal = ()
+    list_filter = ()
 
 
-admin.site.unregister(User)  # here we are unregistering the standard user Auth model, then we need to register
-admin.site.register(User, CustomizedUserAdmin)  # responsible to add the customs fields in line on the admin
+
+
+admin.site.register(CustomUser, CustomizedUserAdmin)
 admin.site.register(UserProfile)
-
-admin.site.register(CustomUser)

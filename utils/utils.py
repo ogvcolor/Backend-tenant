@@ -208,19 +208,6 @@ def format_data_mes_ano(dates: str, months: str) -> list:
     return format_date
 
 
-def get_color_order_for_voluntary_and_involuntary(chart):
-    category_turnover = []
-    for category in chart["series"]["series"]:
-        cat = category.get("name")
-        category_turnover.append(cat)
-
-    if category_turnover[0] == "Voluntary" or category_turnover[0] == "Voluntário":
-        chart.update({'color': ["#2896DC", "#19D7AA"]})
-    if category_turnover[0] == "Involuntary" or category_turnover[0] == "Involuntário":
-        chart.update({'color': ["#19D7AA", "#2896DC"]})
-
-    return chart
-
 
 def formata_mes(meses):
     meses = [str(mes.split('-')[1]) for mes in meses]

@@ -20,3 +20,5 @@ domain.save ()
 Outra forma de criar 
 
 python manage.py create_tenant --domain-domain=test.localhost --schema_name=test --name=test
+
+python manage.py create_tenant_superuser # criar um super user pra cada tenant

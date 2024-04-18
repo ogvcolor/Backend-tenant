@@ -7,7 +7,11 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 import uuid
 
+from django.contrib.auth.models import User
+from django.db.models import Q
 
+def get_current_user():
+    return User.objects.filter(Q(is_superuser=True) | Q(is_staff=True)).first()
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -18,6 +22,18 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
+    
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if not extra_fields.get('is_staff'):
+            raise ValueError('Superuser must have is_staff = True')
+        
+        if not extra_fields.get('is_superuser'):
+            raise ValueError('Superuser must have is_superuser = True')
+        return self.create_user(email, password, **extra_fields)
     
 
 class CustomUser(AbstractBaseUser):
@@ -48,34 +64,28 @@ class CustomUser(AbstractBaseUser):
         return True
 
     
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-
-        if not extra_fields.get('is_staff'):
-            raise ValueError('Superuser must have is_staff = True')
-        
-        if not extra_fields.get('is_superuser'):
-            raise ValueError('Superuser must have is_superuser = True')
-        return self.create_user(email, password, **extra_fields)
+    
         
 
 class UserProfile(models.Model):
     
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
     job_position = models.CharField(max_length=100)
     directory = models.CharField(max_length=100)
     email = models.CharField(max_length=200, default='teste@teste.com.br')
     privacy_policy = models.BooleanField(default=False) # se o ususario aceitou os termos de privacidade
     canseename = models.BooleanField(default = False) # Indica se o usuario pode ser visualizado ou não. 
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=get_current_user)
     
     def __str__(self) -> str:
         return self.email
 
+class Meta:
+        db_table = 'tenant.login_customuser'
+
 class AccessLevel(models.Model):
 
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
     profile	= models.CharField(max_length=100)
     column = models.CharField(max_length=100)
     title = models.CharField(max_length=100, default = 'Plant')
@@ -86,7 +96,7 @@ class AccessLevel(models.Model):
 
 class UserAccessLevel(models.Model):
 
-    id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
     auth_user = models.CharField(max_length=100)
     user_email = models.CharField(max_length=100)
     access_level = models.CharField(max_length=100)
