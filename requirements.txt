@@ -4,6 +4,7 @@ cffi==1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
 colorama==0.4.6
+colormath==3.0.0
 colour-science==0.4.4
 contourpy==1.2.0
 cryptography==42.0.5
@@ -23,6 +24,7 @@ kiwisolver==1.4.5
 knox==0.1.14
 loguru==0.7.2
 matplotlib==3.8.2
+networkx==3.3
 numpy==1.26.3
 packaging==23.2
 pandas==2.2.0
