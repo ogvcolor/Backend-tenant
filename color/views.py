@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 from django.http import JsonResponse
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
@@ -31,7 +32,7 @@ class ColorListAllView(generics.ListAPIView):
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = Color.objects.all().order_by("sampleName")
+    queryset = Color.objects.all().order_by("sample_name")
     serializer_class = ColorSerializer
 
 
@@ -43,7 +44,7 @@ class ColorListView(APIView):
 
     def get(self, request):
         """GET"""
-        colors = Color.objects.filter(isGlobal=True).order_by("sampleName")
+        colors = Color.objects.filter(is_global=True).order_by("sample_name")
         serializer = ColorSerializer(colors, many=True)
         return Response(serializer.data)
 
@@ -57,7 +58,7 @@ class ColorListByUserIdView(APIView):
     def get(self, request, user_id):
         """GET"""
         try:
-            user_colors = Color.objects.filter(userId=user_id).order_by("sampleName")
+            user_colors = Color.objects.filter(user=user_id).order_by("sample_name")
             serializer = ColorSerializer(user_colors, many=True)
             return Response(serializer.data)
         except Color.DoesNotExist:
@@ -103,12 +104,12 @@ class ColorCreateView(APIView):
                 spectral_number_serializer = SpectralNumberSerializer(data=data)
                 if spectral_number_serializer.is_valid():
                     spectral_number_serializer.save(
-                        userId=request.user, colorId=color_instance
+                        user=request.user, color=color_instance
                     )
                 else:
                     error.append(
                         {
-                            "field": "spectralNumbers",
+                            "field": "spectral_numbers",
                             "message": spectral_number_serializer.errors,
                         }
                     )
@@ -154,12 +155,12 @@ class ColorCreateAllView(APIView):
                     spectral_number_serializer = SpectralNumberSerializer(data=data)
                     if spectral_number_serializer.is_valid():
                         spectral_number_serializer.save(
-                            userId=request.user, colorId=color_instance
+                            userId=request.user, color=color_instance
                         )
                     else:
                         errors.append(
                             {
-                                "field": "spectralNumbers",
+                                "field": "spectral_numbers",
                                 "message": spectral_number_serializer.errors,
                             }
                         )

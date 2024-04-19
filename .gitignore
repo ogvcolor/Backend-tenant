@@ -145,4 +145,6 @@ login/__pycache__/
 
 
 # para evitar adicionar os arquivos de migração da pasta migrations dos apps
-**/migrations/
+migrations/
+*/migrations/
+*0001_initial*

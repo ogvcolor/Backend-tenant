@@ -1,8 +1,8 @@
 # biblio principal contendo as fórmulas
 import colour
-
-# import matplotlib.pyplot as plt
 import numpy as np
+from colormath.color_conversions import convert_color
+from colormath.color_objects import LabColor, sRGBColor
 from knox.auth import TokenAuthentication
 
 # from numpy.polynomial.polynomial import Polynomial
@@ -260,5 +260,33 @@ class GetDeltaEHfromLabView(APIView):
             {
                 "delta_es": delta_es,
                 "delta_hs": delta_hs,
+            }
+        )
+
+
+class GetMeasureConversions(APIView):
+    """
+    Recebe dados espectrais de leituras diretas do EyeOne através da ReadData table e converte
+    em LAB, RGB e CMYK data
+    """
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+
+        lab_item = [
+            calculate_lab(item["spectralNumber"], illuminant_D50)
+            for item in request.data
+        ]
+        rgb_item = [calculate_RGB(item["spectralNumber"]) for item in request.data]
+
+        lab_converted = [LabColor(*item) for item in lab_item]
+        rgb_colormath = [convert_color(item, sRGBColor) for item in lab_converted]
+
+        return Response(
+            {
+                "lab": lab_item,
+                "rgb": rgb_item,
             }
         )

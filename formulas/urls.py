@@ -15,4 +15,9 @@ urlpatterns = [
         views.GetDeltaEHfromLabView.as_view(),
         name="get-deltaeh-from-lab",
     ),
+    path(
+        "get-measure-conversion/",
+        views.GetMeasureConversions.as_view(),
+        name="get-measure-conversion",
+    ),
 ]

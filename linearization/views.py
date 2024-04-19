@@ -13,9 +13,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from scipy.interpolate import interp1d, lagrange, make_interp_spline
 
-from .models import CalibrationProject, ColorSet, MeasuredValues, TargetSet
-from .serializers import (CalibrationProjectSerializer, ColorSetSerializer,
-                          MeasuredValuesSerializer, TargetSetSerializer)
+from .models import CalibrationProject, ColorSet, Measured, TargetSet
+from .serializers import (
+    CalibrationProjectSerializer,
+    ColorSetSerializer,
+    MeasuredSerializer,
+    TargetSetSerializer,
+)
 
 
 class LinearizationView(APIView):
@@ -506,8 +510,8 @@ class MeasuredListAllView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        measured_values = MeasuredValues.objects.all()
-        serializer = MeasuredValuesSerializer(measured_values, many=True)
+        measured_values = Measured.objects.all()
+        serializer = MeasuredSerializer(measured_values, many=True)
         return Response(serializer.data)
 
 
@@ -517,12 +521,12 @@ class MeasuredListByUserIdView(APIView):
 
     def get(self, request, calibration_project):
         try:
-            measured_values = MeasuredValues.objects.filter(
+            measured_values = Measured.objects.filter(
                 calibration_project=calibration_project
             ).order_by("name")
-            serializer = MeasuredValuesSerializer(measured_values, many=True)
+            serializer = MeasuredSerializer(measured_values, many=True)
             return Response(serializer.data)
-        except MeasuredValuesSerializer.DoesNotExist:
+        except MeasuredSerializer.DoesNotExist:
             return Response(
                 {
                     "message": "No measured values were found for the given calibration project"
@@ -539,7 +543,7 @@ class MeasuredCreateView(APIView):
         error = []
 
         entity = request.data
-        serializer = MeasuredValuesSerializer(data=entity)
+        serializer = MeasuredSerializer(data=entity)
 
         if not serializer.is_valid():
             for field, messages in serializer.errors.items():
@@ -565,15 +569,15 @@ class MeasuredUpdateView(APIView):
 
     def patch(self, request, pk):
         try:
-            project = MeasuredValues.objects.get(id=pk)
-        except MeasuredValues.DoesNotExist:
+            project = Measured.objects.get(id=pk)
+        except Measured.DoesNotExist:
             response = {
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "message": "Measured Values not found with the provided ID",
             }
             return JsonResponse(response, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MeasuredValuesSerializer(instance=project, data=request.data)
+        serializer = MeasuredSerializer(instance=project, data=request.data)
 
         if serializer.is_valid():
             serializer.save()

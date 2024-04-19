@@ -3,16 +3,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.standard_over_view, name="standard-overview"),
+    path("", views.certification_over_view, name="certification-overview"),
     path(
-        "get-cmyk-dataset/",
-        views.CMYKDataSetListAllView.as_view(),
-        name="get-cmyk-dataset",
+        "get-reference/",
+        views.ReferenceListAllView.as_view(),
+        name="get-reference",
     ),
     path(
-        "cmyk-dataset-user/<str:user_id>",
-        views.CMYKDataSetListByUserIdView.as_view(),
-        name="cmyk-dataset-list-userr",
+        "reference-user/<str:user_id>",
+        views.ReferenceListByUserIdView.as_view(),
+        name="reference-list-userr",
     ),
     path(
         "get-chart-proof/",
@@ -30,9 +30,9 @@ urlpatterns = [
         name="get-tolerance",
     ),
     path(
-        "create-cmyk-dataset/",
+        "create-dataset/",
         views.CreateCMYKDataSetView.as_view(),
-        name="create-cmyk-dataset",
+        name="create-dataset",
     ),
     path(
         "cmyk-data-id/<str:data_id>/",
@@ -46,17 +46,17 @@ urlpatterns = [
     ),
     path(
         "result-update/<str:pk>/",
-        views.UpdateComparisonResultSetView.as_view(),
+        views.UpdateResultSetView.as_view(),
         name="result-update",
     ),
     path(
         "result-delete/<str:pk>/",
-        views.DeleteComparisonResultView.as_view(),
+        views.DeleteResultView.as_view(),
         name="result-delete",
     ),
     path(
         "create-comparison-result/",
-        views.CreateComparisonResultsSetView.as_view(),
+        views.CreateResultSetView.as_view(),
         name="create-comparison-result",
     ),
 ]

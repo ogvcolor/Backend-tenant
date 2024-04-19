@@ -1,21 +1,27 @@
+"""
+    cria um id único composto de números e caracteres
+"""
+
 import uuid
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from login.models import CustomUser
 
 
-class CMYKDataSet(models.Model):
+class Reference(models.Model):
     """
     Contém os valores CMYK padrão de acordo com o 'CMYK Characterization Data' do site color.org
     """
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
-    reference_name = models.CharField(max_length=100, unique=True)  # Ex. FOGRA39
+    name = models.CharField(max_length=100, unique=True)  # Ex. FOGRA39
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=True, blank=True
     )
     illuminant = models.CharField(null=True, blank=True)
@@ -36,7 +42,7 @@ class CMYKDataSet(models.Model):
 
     objects = (
         models.Manager()
-    )  # Adiciona explicitamente o gerenciador de objetos 'objects' para que o Pylint não fique frescando dizendo que não tem objects
+    )  # para que o Pylint não fique frescando dizendo que não tem objects em views.py
 
 
 class ChartProof(models.Model):
@@ -45,26 +51,27 @@ class ChartProof(models.Model):
     """
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
-    reference_name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=True, blank=True
     )
     rows = models.IntegerField(default=0)
     columns = models.IntegerField(default=0)
     objects = (
         models.Manager()
-    )  # Adiciona explicitamente o gerenciador de objetos 'objects' para que o Pylint não fique frescando dizendo que não tem objects
+    )  # para que o Pylint não fique frescando dizendo que não tem objects em views.py
 
 
 class Tolerance(models.Model):
     """
-    Contém os dados relacionados aos métodos de Avaliação como valores de tolerância e também os DeltaE relacionados a cada um deles. Por isso formato JSON
+    Contém os dados relacionados aos métodos de Avaliação como valores de tolerância
+    e também os DeltaE relacionados a cada um deles. Por isso formato JSON
     """
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=True, blank=True
     )
     name = models.CharField(max_length=100, unique=True)
@@ -76,6 +83,8 @@ class Tolerance(models.Model):
     average = models.JSONField(max_length=20)
     maximum = models.JSONField(max_length=20)
     primary_maximum = models.JSONField(max_length=20)
+    average_H = models.JSONField(max_length=20, default=dict)
+    primary_maximum_H = models.JSONField(max_length=20, default=dict)
     CMYK = models.JSONField(max_length=20)  # Terá sempre a ordem de CMYK!
     secondary = models.JSONField(
         max_length=20
@@ -83,40 +92,47 @@ class Tolerance(models.Model):
 
     objects = (
         models.Manager()
-    )  # Adiciona explicitamente o gerenciador de objetos 'objects' para que o Pylint não fique frescando dizendo que não tem objects
+    )  # para que o Pylint não fique frescando dizendo que não tem objects em views.py
 
 
-class ComparisonResults(models.Model):
+class Result(models.Model):
     """
-    Contém os valores do resultado da comparação dos dados das cores do usuário e os padrões do CMYKDataSet, assim como os dados CMYK do usuário
+    Contém os valores do resultado da comparação dos dados das cores do usuário
+    e os padrões do CMYKDataSet, assim como os dados CMYK do usuário
     """
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
-    user_id = models.ForeignKey(
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, null=True, blank=True
     )
     name = models.CharField(max_length=100, unique=True)
     tolerance = models.ForeignKey(
         Tolerance, on_delete=models.DO_NOTHING, null=False
-    )  # Se deletar o evaluation_method, não vai deletar os resultados, mas ao renderizar, vai aparecer nenhum valor de tolerância
-    cmyk_dataset = models.ForeignKey(
-        CMYKDataSet,
+    )  # Se deletar o evaluation_method, não vai deletar os resultados
+    # mas ao renderizar, vai aparecer nenhum valor de tolerância
+    reference = models.ForeignKey(
+        Reference,
         on_delete=models.DO_NOTHING,
         null=False,
         default="f6e6bbfe-60a7-4a4e-90a9-b75dbbc9a1ef",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     paper = models.FloatField(max_length=20)
     average = models.FloatField(max_length=20)
     maximum = models.FloatField(max_length=20)
     primary_maximum = models.FloatField(max_length=20)
+    average_H = models.FloatField(max_length=20)
+    primary_maximum_H = models.FloatField(max_length=20)
     CMYK = ArrayField(models.FloatField(max_length=20), size=4, default=list)
     secondary = ArrayField(models.FloatField(max_length=20), size=3, default=list)
+    comment = models.CharField(
+        max_length=300, null=True, blank=True
+    )  # mensagens automatizadas
 
     objects = (
         models.Manager()
-    )  # Adiciona explicitamente o gerenciador de objetos 'objects' para que o Pylint não fique frescando dizendo que não tem objects
+    )  # para que o Pylint não fique frescando dizendo que não tem objects em views.py
 
 
 class CMYKData(models.Model):
@@ -126,35 +142,21 @@ class CMYKData(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
     reference_name = models.CharField(max_length=100)  # Ex. 000-010-000-000
-    sample_id = models.CharField(max_length=100, null=True)
-    sample_name = models.CharField(max_length=100, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    cmyk = ArrayField(models.FloatField(max_length=20), size=4, default=list)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     lab = ArrayField(models.FloatField(max_length=20), size=3, default=list, null=True)
     rgb = models.CharField("RGB", default="rgb(255, 255, 255)", null=True)
-    chart_proof = models.ForeignKey(
-        ChartProof,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="cmyk_data",
-    )
-    cmyk_dataset = models.ForeignKey(
-        CMYKDataSet,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="cmyk_data",
-    )
-    comparison_results = models.ForeignKey(
-        ComparisonResults,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="cmyk_data",
-    )
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE
+    )  # ex. certification | reference
+    object_id = models.UUIDField()  # o id do reference
+    content_object = GenericForeignKey("content_type", "object_id")  # nome do reference
+    """
+        content_type, object_id e content_object são necessários para criar um GenericForeignKey
+        para que consiga associar uma das ForeignKey que irá conter os resultados do CMYK:
+        Reference, ChartProof e Result
+    """
 
     objects = (
         models.Manager()
-    )  # Adiciona explicitamente o gerenciador de objetos 'objects' para que o Pylint não fique frescando dizendo que não tem objects
+    )  # para que o Pylint não fique frescando dizendo que não tem objects em views.py

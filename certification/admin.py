@@ -1,24 +1,27 @@
-# padrão do Django
+"""
+    Padrão do Django
+"""
+
 from django.contrib import admin
 
-from .models import ChartProof, CMYKDataSet, ComparisonResults, Tolerance
+from .models import ChartProof, Reference, Result, Tolerance
 
 
-class CMYKDataSetAdmin(admin.ModelAdmin):
+class ReferenceAdmin(admin.ModelAdmin):
     """
-    CMYK Data Set
+    Reference
     """
 
-    list_display = (
+    list_display = [
         "id",
-        "reference_name",
+        "name",
         "created_at",
         "updated_at",
-        "user_id",
+        "user",
         "illuminant",
         "observer",
         "filter",
-    )
+    ]
 
 
 class ChartProofAdmin(admin.ModelAdmin):
@@ -26,15 +29,15 @@ class ChartProofAdmin(admin.ModelAdmin):
     Chart Proof
     """
 
-    list_display = (
+    list_display = [
         "id",
-        "reference_name",
+        "name",
         "created_at",
         "updated_at",
-        "user_id",
+        "user",
         "rows",
         "columns",
-    )
+    ]
 
 
 class ToleranceAdmin(admin.ModelAdmin):
@@ -42,44 +45,49 @@ class ToleranceAdmin(admin.ModelAdmin):
     Tolerance
     """
 
-    list_display = (
+    list_display = [
         "id",
         "name",
-        "user_id",
+        "user",
         "created_at",
         "updated_at",
         "paper",
         "average",
         "maximum",
         "primary_maximum",
+        "average_H",
+        "primary_maximum_H",
         "CMYK",
         "secondary",
-    )
+    ]
 
 
-class ComparisonResultsAdmin(admin.ModelAdmin):
+class ResultAdmin(admin.ModelAdmin):
     """
-    ComparisonResults
+    ComparisonResult
     """
 
-    list_display = (
+    list_display = [
         "id",
         "name",
-        "user_id",
+        "user",
         "created_at",
         "updated_at",
         "tolerance",
-        "cmyk_dataset",
+        "reference",
         "paper",
         "average",
         "maximum",
         "primary_maximum",
-        "CMYK",
+        "average_H",
+        "primary_maximum_H",
+        "average_H",
         "secondary",
-    )
+        "comment",
+    ]
 
 
-admin.site.register(CMYKDataSet, CMYKDataSetAdmin)
+admin.site.register(Reference, ReferenceAdmin)
 admin.site.register(ChartProof, ChartProofAdmin)
 admin.site.register(Tolerance, ToleranceAdmin)
-admin.site.register(ComparisonResults, ComparisonResultsAdmin)
+admin.site.register(Result, ResultAdmin)

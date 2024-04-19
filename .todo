@@ -1,3 +1,4 @@
+"""
 1- from app.models import Client, Domain
 
 2- tenant = Client (schema_name = "public", name= "public")
@@ -16,9 +17,12 @@ domain = Domain(domain= "delta.localhost", tenant=tenant, is_primary=True)
 
 domain.save ()
 
-##### 
-Outra forma de criar 
+#####
+Outra forma de criar
 
 python manage.py create_tenant --domain-domain=test.localhost --schema_name=test --name=test
+python manage.py create_tenant --domain-domain=localhost --schema_name=public --name=public
 
 python manage.py create_tenant_superuser # criar um super user pra cada tenant
+
+"""

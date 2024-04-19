@@ -1,6 +1,10 @@
+"""
+    Certification Serializer
+"""
+
 from rest_framework import serializers
 
-from .models import ChartProof, CMYKData, CMYKDataSet, ComparisonResults, Tolerance
+from .models import ChartProof, CMYKData, Reference, Result, Tolerance
 
 
 class CMYKDataSerializer(serializers.ModelSerializer):
@@ -9,11 +13,15 @@ class CMYKDataSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
+        """
+        Meta
+        """
+
         model = CMYKData
         fields = "__all__"
 
 
-class CMYKDataSetSerializer(serializers.ModelSerializer):
+class ReferenceSerializer(serializers.ModelSerializer):
     """
     CMYK DataSet Serializer
     """
@@ -21,7 +29,11 @@ class CMYKDataSetSerializer(serializers.ModelSerializer):
     cmyk_data = CMYKDataSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CMYKDataSet
+        """
+        Meta
+        """
+
+        model = Reference
         fields = "__all__"
 
 
@@ -33,6 +45,10 @@ class ChartProofSerializer(serializers.ModelSerializer):
     cmyk_data = CMYKDataSerializer(many=True, read_only=True)
 
     class Meta:
+        """
+        Meta
+        """
+
         model = ChartProof
         fields = "__all__"
 
@@ -43,17 +59,25 @@ class ToleranceSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
+        """
+        Meta
+        """
+
         model = Tolerance
         fields = "__all__"
 
 
-class ComparisonResultsSerializer(serializers.ModelSerializer):
+class ResultSerializer(serializers.ModelSerializer):
     """
-    Comparison Results Serializer
+    Results Serializer
     """
 
     cmyk_data = CMYKDataSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ComparisonResults
+        """
+        Meta
+        """
+
+        model = Result
         fields = "__all__"

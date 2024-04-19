@@ -7,39 +7,39 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import ChartProof, CMYKData, CMYKDataSet, ComparisonResults, Tolerance
+from .models import ChartProof, CMYKData, Reference, Result, Tolerance
 from .serializers import (
     ChartProofSerializer,
     CMYKDataSerializer,
-    CMYKDataSetSerializer,
-    ComparisonResultsSerializer,
+    ReferenceSerializer,
+    ResultSerializer,
     ToleranceSerializer,
 )
 
 
 @api_view(["GET"])
-def standard_over_view():
-    """Show Standard Endpoints"""
+def certification_over_view():
+    """Show Certification Endpoints"""
     api_urls = {
-        "Get CMKY DataSet": "get-cmky-dataset/",
+        "Get Reference": "get-reference/",
         "Get Chart Proof": "get-chart-proof/",
-        "Create CMYK DataSet": "create-cmyk-dataset/",
-        "Create Tolerance Method": "create-tolerance-method/",
+        "Create Reference": "create-reference/",
+        "Create Tolerance Method": "create-tolerance/",
     }
 
     return Response(api_urls)
 
 
-class CMYKDataSetListAllView(generics.ListAPIView):
+class ReferenceListAllView(generics.ListAPIView):
     """Lista todos os CMYK Data Set como FOGRA39"""
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = CMYKDataSet.objects.all()
-    serializer_class = CMYKDataSetSerializer
+    queryset = Reference.objects.all()
+    serializer_class = ReferenceSerializer
 
 
-class CMYKDataSetListByUserIdView(generics.ListAPIView):
+class ReferenceListByUserIdView(generics.ListAPIView):
     """Lista todos os CMYK Data Set de um User"""
 
     authentication_classes = (TokenAuthentication,)
@@ -48,10 +48,10 @@ class CMYKDataSetListByUserIdView(generics.ListAPIView):
     def get(self, request, user_id):
         """GET"""
         try:
-            user_data = CMYKDataSet.objects.filter(user_id=user_id)
-            serializer = CMYKDataSetSerializer(user_data, many=True)
+            user_data = Reference.objects.filter(user_id=user_id)
+            serializer = ReferenceSerializer(user_data, many=True)
             return Response(serializer.data)
-        except CMYKDataSet.DoesNotExist:
+        except Reference.DoesNotExist:
             return Response(
                 {
                     "message": "Nenhum CMYDataSet foi encontrado para o usuário com o ID fornecido"
@@ -142,13 +142,13 @@ class ToleranceListAllView(generics.ListAPIView):
     serializer_class = ToleranceSerializer
 
 
-class ComparisonResultsListAllView(generics.ListAPIView):
+class ResultListAllView(generics.ListAPIView):
     """Lista todos os resultados de controle de qualidade como níveis de tolerância"""
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = ComparisonResults.objects.all()
-    serializer_class = ComparisonResultsSerializer
+    queryset = Result.objects.all()
+    serializer_class = ResultSerializer
 
 
 class CreateCMYKDataSetView(APIView):
@@ -167,7 +167,7 @@ class CreateCMYKDataSetView(APIView):
         errors = []
 
         if request.data["type"] == "CMYKDataSet":
-            data_set_serializer = CMYKDataSetSerializer(data=request.data)
+            data_set_serializer = ReferenceSerializer(data=request.data)
         else:
             data_set_serializer = ChartProofSerializer(data=request.data)
 
@@ -178,6 +178,10 @@ class CreateCMYKDataSetView(APIView):
         else:
             for field, messages in data_set_serializer.errors.items():
                 errors.append({"field": field, "messages": messages})
+            print("")
+            print("")
+            print("")
+            print("errors", errors)
 
         # Serializa os dados de CMYKData
         for item in request.data["cmyk_data"]:
@@ -218,7 +222,7 @@ class CreateToleranceSetView(APIView):
 
         if serializer.is_valid():
             # Salva a instância do Tolerance
-            tolerance_instance = serializer.save()
+            serializer.save()
 
         else:
             error.append({"message": serializer.errors})
@@ -235,7 +239,7 @@ class CreateToleranceSetView(APIView):
             return Response(response, status=status.HTTP_201_CREATED)
 
 
-class CreateComparisonResultsSetView(APIView):
+class CreateResultSetView(APIView):
     """
     Salva os dados de Métodos de Avaliação, como níveis de tolerância e DeltaE associados
 
@@ -247,7 +251,7 @@ class CreateComparisonResultsSetView(APIView):
     def post(self, request):
         """POST"""
         errors = []
-        serializer = ComparisonResultsSerializer(data=request.data)
+        serializer = ResultSerializer(data=request.data)
         saved_items = []
 
         if serializer.is_valid():
@@ -284,7 +288,7 @@ class CreateComparisonResultsSetView(APIView):
             return Response(response, status=status.HTTP_201_CREATED)
 
 
-class UpdateComparisonResultSetView(APIView):
+class UpdateResultSetView(APIView):
     """Update a Comparison Result"""
 
     authentication_classes = (TokenAuthentication,)
@@ -293,15 +297,15 @@ class UpdateComparisonResultSetView(APIView):
     def patch(self, request, pk):
         """PATCH"""
         try:
-            result = ComparisonResults.objects.get(id=pk)
-        except ComparisonResults.DoesNotExist:
+            result = Result.objects.get(id=pk)
+        except Result.DoesNotExist:
             response = {
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "message": "Result not found with the provided ID",
             }
             return JsonResponse(response, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ComparisonResults(instance=result, data=request.data)
+        serializer = Result(instance=result, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -320,7 +324,7 @@ class UpdateComparisonResultSetView(APIView):
             return JsonResponse(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DeleteComparisonResultView(APIView):
+class DeleteResultView(APIView):
     """Delete Comparison Results"""
 
     authentication_classes = (TokenAuthentication,)
@@ -329,9 +333,9 @@ class DeleteComparisonResultView(APIView):
     def delete(self, request, pk):
         """DELETE"""
         try:
-            color = ComparisonResults.objects.get(id=pk)
+            color = Result.objects.get(id=pk)
             color.delete()
-        except ComparisonResults.DoesNotExist:  # pylint: disable=no-member
+        except Result.DoesNotExist:
             response = {
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "message": "Comparison Result not found",
