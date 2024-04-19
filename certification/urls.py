@@ -55,7 +55,7 @@ urlpatterns = [
         name="result-delete",
     ),
     path(
-        "create-comparison-result/",
+        "create-result/",
         views.CreateResultSetView.as_view(),
         name="create-comparison-result",
     ),

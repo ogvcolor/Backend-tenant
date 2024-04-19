@@ -142,6 +142,7 @@ class CMYKData(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, null=False, blank=False, primary_key=True)
     reference_name = models.CharField(max_length=100)  # Ex. 000-010-000-000
+    sample_name = models.CharField(max_length=100, blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     lab = ArrayField(models.FloatField(max_length=20), size=3, default=list, null=True)

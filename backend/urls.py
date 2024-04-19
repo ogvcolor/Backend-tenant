@@ -27,5 +27,5 @@ urlpatterns = [
     path("api/formulas/", include("formulas.urls")),
     path("api/calibration/", include("linearization.urls")),
     path("api/", include("data_processing.urls")),
-    path("api/standard/", include("certification.urls")),
+    path("api/certification/", include("certification.urls")),
 ]

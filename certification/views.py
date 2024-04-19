@@ -166,7 +166,7 @@ class CreateCMYKDataSetView(APIView):
         saved_items = []
         errors = []
 
-        if request.data["type"] == "CMYKDataSet":
+        if request.data["type"] == "Reference":
             data_set_serializer = ReferenceSerializer(data=request.data)
         else:
             data_set_serializer = ChartProofSerializer(data=request.data)
@@ -188,7 +188,7 @@ class CreateCMYKDataSetView(APIView):
             cmyk_data_serializer = CMYKDataSerializer(data=item)
 
             if cmyk_data_serializer.is_valid():
-                if request.data["type"] == "CMYKDataSet":
+                if request.data["type"] == "Reference":
                     cmyk_data = cmyk_data_serializer.save(cmyk_dataset=saved_data)
                 else:
                     cmyk_data = cmyk_data_serializer.save(chart_proof=saved_data)
